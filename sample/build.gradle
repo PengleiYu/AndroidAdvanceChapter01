@@ -4,6 +4,7 @@
 apply plugin: 'com.android.application'
 
 android {
+    namespace 'com.dodola.breakpad'
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.dodola.breakpad"

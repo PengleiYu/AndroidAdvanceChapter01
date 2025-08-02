@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 
 import com.sample.breakpad.BreakpadInit;
@@ -16,6 +17,7 @@ import androidx.core.content.ContextCompat;
 
 
 public class MainActivity extends Activity {
+    private static final String TAG = "MainActivity";
     private static final int WRITE_EXTERNAL_STORAGE_REQUEST_CODE = 100;
 
     static {
@@ -30,15 +32,16 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                    this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    WRITE_EXTERNAL_STORAGE_REQUEST_CODE);
-        } else {
-            initExternalReportPath();
-        }
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            Log.d(TAG, "onCreate: 开始申请权限");
+//            ActivityCompat.requestPermissions(
+//                    this,
+//                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+//                    WRITE_EXTERNAL_STORAGE_REQUEST_CODE);
+//        } else {
+//            initExternalReportPath();
+//        }
 
         findViewById(R.id.crash_btn)
                 .setOnClickListener(
@@ -57,6 +60,7 @@ public class MainActivity extends Activity {
      * 做进一步的分析
      */
     private void initBreakPad() {
+        Log.d(TAG, "initBreakPad() called");
         if (externalReportPath == null) {
             externalReportPath = new File(getFilesDir(), "crashDump");
             if (!externalReportPath.exists()) {
@@ -69,11 +73,13 @@ public class MainActivity extends Activity {
     @Override
     public void onRequestPermissionsResult(
             int requestCode, String[] permissions, int[] grantResults) {
+        Log.d(TAG, "onRequestPermissionsResult() called with: requestCode = [" + requestCode + "], permissions = [" + permissions + "], grantResults = [" + grantResults + "]");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         initExternalReportPath();
     }
 
     private void initExternalReportPath() {
+        Log.d(TAG, "initExternalReportPath() called");
         externalReportPath = new File(Environment.getExternalStorageDirectory(), "crashDump");
         if (!externalReportPath.exists()) {
             externalReportPath.mkdirs();

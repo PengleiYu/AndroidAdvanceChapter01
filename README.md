@@ -142,7 +142,7 @@ https://github.com/google/breakpad
 
 minidump_stackwalk报错
 重新编译[breakpad](https://github.com/google/breakpad)
-执行`./configure && make`即可，文件路径`src/processor/microdump_stackwalk`
+执行`./configure && make`即可，文件路径`src/processor/minidump_stackwalk`
 
 dump文件转堆栈log
 ``` sh

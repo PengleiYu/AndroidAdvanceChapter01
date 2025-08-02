@@ -136,3 +136,35 @@ mac 版：https://dl.google.com/android/repository/android-ndk-r16b-darwin-x86_6
 =======
 https://github.com/google/breakpad
 例子里只提供了 Mac 的工具，如果需要其他平台的工具，可以去编译源码获得，可以参照 breakpad 项目的说明文档来编译获取。
+
+总结
+=======
+
+minidump_stackwalk报错
+重新编译[breakpad](https://github.com/google/breakpad)
+执行`./configure && make`即可，文件路径`src/processor/microdump_stackwalk`
+
+dump文件转堆栈log
+``` sh
+/Users/penglei/AndroidStudioProjects/breakpad/src/processor/minidump_stackwalk 4111a428-d973-41de-f798a693-307c5917.dmp > crashLog.txt
+```
+
+符号解析
+``` sh
+/Users/penglei/Library/Android/sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-addr2line -f -C -e /Users/penglei/AndroidStudioProjects/Chapter01/sample/build/intermediates/merged_native_libs/debug/out/lib/arm64-v8a/libcrash-lib.so 0x64c 
+```
+
+breakpad原理
+1. 注册崩溃相关信号
+2. 信号触发handler函数
+3. clone出子进程
+4. 设置自己可被ptrace (PR_SET_PTRACER)
+5. 通过管道通知子进程ready
+6. wait子进程结束
+7. 子进程stop父进程，并通过ptrace分析父
+8. 子进程完成后，resume父进程并退出
+9. 父进程wait结束
+1. 重置信号处理函数，并重发信号自杀
+
+fork子进程
+父进程使用sys_clone创建子进程，该函数使用前申请了16k的空间用于子进程做函数栈，并指定了ExceptionHandler::ThreadEntry为入口函数。原因是原函数栈可能已损坏，所以使用干净区域做函数栈
